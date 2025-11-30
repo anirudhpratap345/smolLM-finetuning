@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Gradio Web UI
+  gradio:
+    build: .
+    ports:
+      - "7860:7860"
+    environment:
+      - TORCH_DEVICE=cpu  # Change to cuda if GPU available
+      - GRADIO_ANALYTICS_ENABLED=False
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    command: python app.py --server_name 0.0.0.0 --server_port 7860
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Streamlit Web UI (optional)
+  streamlit:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - TORCH_DEVICE=cpu
+      - STREAMLIT_LOGGER_LEVEL=warning
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    command: streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  models:
+  data:
+
+networks:
+  default:
+    name: smollm-network
