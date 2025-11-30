@@ -32,7 +32,7 @@ from scripts.model_setup import setup_smollm2
 from scripts.training_pipeline import train_smollm2
 from scripts.inference import SmolLM2Inference, FinanceEvaluator
 from scripts.hardware import print_hardware_info, get_recommended_config
-
+ 
 
 def main():
     """Main training pipeline."""
